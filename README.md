@@ -28,9 +28,11 @@ Instalar os programas nas versões utilizadas para desenvolvimento.
 2. Executar no shell: composer install
 3. Configure suas variáveis de banco de dados em .env
 4. Acessar o local do projeto no shell
-5. Executar no shell: php artisan migrate
-6. Executar no shell: php artisan serve
-7. Abrir o navegador e digitar o caminho local do projeto.
+5. Executar no shell: php artisan key:generate
+6. Executar no shell: php artisan migrate
+7. Executar no shell: php artisan storage:link
+8. Executar no shell: php artisan serve
+9. Abrir o navegador e digitar o caminho local do projeto.
 
 > <h2> Uso</h2>
  ### Cadastros:
