@@ -5,8 +5,8 @@
 @section("content")
 	<div class="container px-6 my-6 grid">
 		<h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300" >
-			Adicionar Cards ao Deck: 
-		</h4></br>		
+			Adicionar Cards ao Deck:
+		</h4></br>
 		<form action="/card_deck" method="POST" enctype="multipart/form-data">
 				<label class="block text-sm">
 					<span class="text-gray-700 dark:text-gray-400">Cards:</span>
@@ -22,27 +22,27 @@
 				<input type="hidden" id="id" name="id" value="{{ $cardDeck->id }}" />
 				<input type="hidden" id="deck" name="deck" value="{{ $cardDeck->deck }}" />
 				<button type="submit" class="px-4 py-2 font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue" >
-                  Adicionar   
-                </button>		
+                  Adicionar
+                </button>
 			</form>
 			</br>
 			<div class="w-full overflow-hidden rounded-lg shadow-xs">
-            
+
                 <div class="w-full overflow-x-auto">
                     <table class="w-full whitespace-no-wrap ">
                         <thead>
                         <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
 
                             <th class="px-4 py-3">Imagem</th>
-                            <th class="px-4 py-3">Nome</th>                           
+                            <th class="px-4 py-3">Nome</th>
                             <th class="px-4 py-3">Mana</th>
-                            <th class="px-4 py-3">Raridade</th>                            
+                            <th class="px-4 py-3">Raridade</th>
                             <th class="px-4 py-3">Disponibilidade</th>
                             <th class="px-4 py-3">Ações</th>
                         </tr>
                         </thead>
                         <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                       
+
 							@foreach($cds as $c)
 								@if($c->deck_id == $cardDeck->deck)
 								<tr class="text-gray-700 dark:text-gray-400">
@@ -85,15 +85,14 @@
 										Indisponível
 									</span>
 									@endif
-									</td>								
+									</td>
 									<td class="px-4 py-3">
 									<div class="flex items-center space-x-4 text-sm">
-										  <form action="/card_deck/{{ $cardDeck->id }}" method="POST" onclick="return confirm('Tem certeza que deseja remover');">
-												{{ csrf_field() }}
-												{{ method_field('DELETE') }}
-												<input type="hidden" name="_method" value="DELETE" />											
+										  <form action="{{ route('card_deck.destroy', [ 'card_deck' => $c->card_deck_id ]) }}" method="POST" onclick="return confirm('Tem certeza que deseja remover');">
+												@csrf
+                                                @method('DELETE')
 												<button type="submit" class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
-												aria-label="Delete" 
+												aria-label="Delete"
 												>
 													<svg
 													  class="w-5 h-5"
@@ -114,12 +113,12 @@
 								</tr>
 								@endif
 							@endforeach
-                        
-						
+
+
                         </tbody>
                     </table>
-             </div>			   
+             </div>
 		</div>
 	</div>
-	
+
 @endsection

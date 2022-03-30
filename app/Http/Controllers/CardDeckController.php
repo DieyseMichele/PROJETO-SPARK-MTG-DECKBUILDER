@@ -17,16 +17,16 @@ class CardDeckController extends Controller
         // obriga estar logado;
         $this->middleware('auth');
     }
-	
+
 	/**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    
+
 	public function index(Request $request)
 	{
-		
+
 		$cardDeck = new CardDeck();
 		$cardDeck->deck = $request->get("deck");
 		$cardDecks = CardDeck::Where("deck", $request->get("deck"))->get();
@@ -35,7 +35,7 @@ class CardDeckController extends Controller
 		$cds = DB::table('card_deck')
             ->join('cadastro_card', 'cadastro_card.id', '=', 'card_deck.card')
             ->join('cadastrar_deck', 'cadastrar_deck.id', '=', 'card_deck.deck')
-            ->select('cadastro_card.*', 'cadastrar_deck.id AS deck_id')
+            ->select('cadastro_card.*', 'cadastrar_deck.id AS deck_id', 'card_deck.id AS card_deck_id')
             ->get();
 		return view("decks.AdicionarCard", [
 			"cardDeck" => $cardDeck,
@@ -58,15 +58,15 @@ class CardDeckController extends Controller
 		} else {
 			$cardDeck = new CardDeck();
 		}
-		
+
 		$cardDeck->deck = $request->get("deck");
 		$cardDeck->card = $request->get("card");
-		
+
 		$cardDeck->save();
-		
+
 		$request->session()->flash("status", "sucesso");
 		$request->Session()->flash("mensagem", "Card adicionado com sucesso!");
-		
+
 		return redirect()->action(
 			[CardDeckController::class, "index"], [ "deck" => $request->get("deck") ]
 		);
@@ -80,7 +80,7 @@ class CardDeckController extends Controller
      */
     public function show($id)
     {
-        
+
     }
 
     /**
@@ -91,7 +91,7 @@ class CardDeckController extends Controller
      */
     public function edit($id)
     {
-       
+
     }
 
     /**
@@ -112,18 +112,18 @@ class CardDeckController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, Request $request)
+    public function destroy($card_deck, Request $request)
     {
-       $cardDeck = CardDeck::Find($id);
+        $cardDeck = CardDeck::find($card_deck);
 		$deck = $cardDeck->deck;
 		$cardDeck->delete();
-		
-		$request->Session()->flash("status", "sucesso");
-		$request->Session()->flash("mensagem", "Card removido com sucesso!");
-		
+
+		$request->session()->flash("status", "sucesso");
+		$request->session()->flash("mensagem", "Card removido com sucesso!");
+
 		return redirect()->action(
 			[CardDeckController::class, "index"], [ "deck" => $deck ]
 		);
     }
-	
+
 }
