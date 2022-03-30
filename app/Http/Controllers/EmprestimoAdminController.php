@@ -12,7 +12,7 @@ use App\Models\Emprestimo;
 
 class EmprestimoAdminController extends Controller
 {
-	
+
 	public function __construct() {
 		$this->middleware("auth");
 	}
@@ -63,39 +63,42 @@ class EmprestimoAdminController extends Controller
 			"dataEmprestimo" => "required|date|before:dataDevolucao",
 			"dataDevolucao" => "required|date|after:dataEmprestimo",
 			"status" => "required",
-			
+
 		], [
 			"required" => 'O campo :attribute é obrigatório.',
 		]);
-		
+
         if ($request->get("id") != "") {
-			$emprestimo = Emprestimo::Find($request->get("id"));
+			$emprestimo = Emprestimo::find($request->get("id"));
 		} else {
 			$emprestimo = new Emprestimo();
+            $emprestimo->deck_id = $request->get("deck");
 		}
 		$emprestimo->user_id = $request->get("user");
 		$emprestimo->admin_id = $request->get("admin");
-		if (Emprestimo::where('deck_id', '=',$request->get("deck") )->exists()) {
-			if($emprestimo->user_id != $request->get("user")){
-				$request->Session()->flash("status", "erro");
-				$request->Session()->flash("mensagem", "O deck selecionado está indisponível!");
-				return redirect("/emprestimoAdmin");
-			}
-			
-		}else{
-			
+		if (Emprestimo::where('deck_id', $request->get("deck"))
+                        ->orWhere('status', 'E')
+                        ->orWhere('status', 'A')
+                        ->exists()
+            && !$request->get("id")
+        ) {
+            $request->session()->flash("status", "erro");
+            $request->session()->flash("mensagem", "O deck selecionado está indisponível!");
+            return redirect("/emprestimoAdmin");
+		} else {
+
 			$emprestimo->deck_id = $request->get("deck");
 		}
 		$emprestimo->dataEmprestimo = $request->get("dataEmprestimo");
 		$emprestimo->dataDevolucao = $request->get("dataDevolucao");
-		
+
 		$emprestimo->status = $request->get("status");
-		
+
 		$emprestimo->save();
-		
-		$request->Session()->flash("status", "sucesso");
-		$request->Session()->flash("mensagem", "Empréstimo realizado com sucesso!");
-			
+
+		$request->session()->flash("status", "sucesso");
+		$request->session()->flash("mensagem", "Empréstimo realizado com sucesso!");
+
 		return redirect("/emprestimoAdmin");
     }
 
@@ -106,15 +109,15 @@ class EmprestimoAdminController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show()
-    {	
+    {
         $emprestimo = new Emprestimo();
-		
-		$emprestimos = DB::table('Emprestimo')
+
+		$emprestimos = DB::table('emprestimo')
             ->join('users', 'users.id', '=', 'emprestimo.user_id')
             ->join('cadastrar_deck', 'cadastrar_deck.id', '=', 'emprestimo.deck_id')
-            ->select('Emprestimo.*', 'users.name AS usuario', 'cadastrar_deck.name AS deck')
+            ->select('emprestimo.*', 'users.name AS usuario', 'cadastrar_deck.name AS deck')
             ->get();
-		
+
         return view("emprestimos.relatorioEmprestimo", [
 			"emprestimo" => $emprestimo,
 			"emprestimos" => $emprestimos
@@ -156,13 +159,13 @@ class EmprestimoAdminController extends Controller
     {
         //
     }
-	
+
 	//busca na tabela de relatório de emprestimo
 	public function searchEmprestimo(Request $request){
 		// Get the search value from the request
 		$search = $request->input('search');
 
-		
+
 		// Search in the title and body columns from the posts table
 		$emprestimos = Emprestimo::query()
 			->join('users', 'users.id', '=', 'emprestimo.user_id')
@@ -187,12 +190,12 @@ class EmprestimoAdminController extends Controller
     public function destroy(Request $request,$id)
     {
         Emprestimo::Destroy($id);
-		
+
 		$request->Session()->flash("status", "sucesso");
 		$request->Session()->flash("mensagem", "Empréstimo excluído com sucesso!");
-		
+
 		return redirect("/relatorioEmprestimo");
     }
-	
-	
+
+
 }
