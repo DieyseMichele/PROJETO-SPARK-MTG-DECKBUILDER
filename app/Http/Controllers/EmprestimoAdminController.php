@@ -77,8 +77,10 @@ class EmprestimoAdminController extends Controller
 		$emprestimo->user_id = $request->get("user");
 		$emprestimo->admin_id = $request->get("admin");
 		if (Emprestimo::where('deck_id', $request->get("deck"))
-                        ->orWhere('status', 'E')
-                        ->orWhere('status', 'A')
+                        ->where(function($query) {
+                            $query->where('status', 'E')
+                                  ->orWhere('status', 'A');
+                        })
                         ->exists()
             && !$request->get("id")
         ) {
